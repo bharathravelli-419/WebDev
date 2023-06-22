@@ -1,25 +1,60 @@
 *{
-    padding: 0px;
-    margin: 0px;
+    box-sizing: border-box;
 }
-div.header{
-    margin: 0px;
-    padding: 10px;
-    background-color: yellow;
+div.main{
     display: flex;
-    list-style-type: none;
+    gap: 1rem;
     align-items: center;
-    gap: 10px;
+    height: 100vh;
+    width: 100vw;
+    justify-content: center;
+    background-color: aqua;
+}
+div.card{
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    flex-direction: column;
+    
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 10%;
+    padding: 2%;
+    position: relative;
+    color:azure;
+    background-color: cornflowerblue;
+}
+div.card > h2{
+    position: absolute;
+    right :37%;
+    bottom: 77%;
+}
+div.card > ul >li{
+   
+    
+    list-style-type:none;
     
 }
-li{
+div.button{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 10%;
+    padding: 5%;
+    font-size: 0.9rem;
+    max-width: 90px;
+    height: 30px;
+    background-color: brown;
+    align-self: center;
+    
+}
+@media (max-width:600px){
  
-     margin: 5px;   
-    font-weight: bold;
-    color: brown;
-    
-}
-li:hover{
-    color: blue;
-    cursor: pointer;
+    div.main{
+       flex-direction: column;
+       height: 100vh;
+       width: 100vw;
+       padding: 30%;
+
+    }
+
 }
