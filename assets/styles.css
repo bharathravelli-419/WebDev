@@ -1,6 +1,11 @@
-.flex-container{
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.big-title{
+    font-size: 10rem;
+    color: blueviolet;
+    background-color: aqua;
 }
+
+.fonts{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
