@@ -1,7 +1,7 @@
 {
-  "name": "learning-npm",
+  "name": "qr_code_generator",
   "version": "1.0.0",
-  "description": "I'm learning NPM",
+  "description": "Generates a QR code according to the URL",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
   "author": "Ravelli.Bharath",
   "license": "ISC",
   "dependencies": {
-    "sillyname": "^0.1.0",
-    "superheroes": "^3.0.0"
+    "inquirer": "^9.2.7",
+    "qr-image": "^3.2.0"
   }
 }
