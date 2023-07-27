@@ -1,139 +1,123 @@
+const mongoose = require('mongoose');
 const express = require('express');
-const bodyParser = require('body-parser')
-const ejs = require('ejs')
-const mongoose = require('mongoose')
-const date = require(__dirname+'/date.js')
+const bodyParser = require('body-parser');
+const ejs = require('ejs');
+const { rmSync } = require('fs');
 
-
-//Declaring Global array of workList
-const workList=[];
-//Declaring Global array
-var newItemsList =[]
-
-//application creation
 const app = express();
 
-//setting app view engine to ejs
-app.set("view engine","ejs");
-
-//using body-parser
+app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
-
-//setting static files in public folder
 app.use(express.static('public'));
 
-// ---------------DATA BASE CONNECTION and DB CODE ----------------------------
+const main =async()=>{
+   try{
+    await mongoose.connect("mongodb://127.0.0.1:27017/articlesDB");
+    console.log("Connected to articlesDB");
+   }
+   catch(err){
+    console.log('The error is : ',err);
+   }
+}
 
-const main = async () => {
+main();
+
+const articleSchema = {
+    name:String,
+    content:String
+}
+const article = mongoose.model('article',articleSchema);
+
+app.route("/articles")
+.get(async(req,res)=>{
+    const result = await article.find({});
+    res.send(result);  
+
+})
+.post(async(req,res)=>{
+   
+    const name = req.body.name;
+    const content = req.body.content;
+    
+    const newArticle = new article({
+        name : name,
+        content : content
+    })
+    try{
+        await newArticle.save();
+        res.send('Data Saved Successfully !!')
+    }
+    catch(err){
+        res.send(err);
+    }
+
+
+})
+.delete(async(req,res)=>{
+    try{
+        await article.deleteMany();
+        res.send('Deleted all records Successfully');
+    }
+    catch(err){
+        res.send(err);
+    }
+
+})
+
+app.route('/articles/:articleName')
+.get(async(req,res)=>{
 
     try{
-      await  mongoose.connect('mongodb://127.0.0.1:27017/TodoListDB');
-        console.log("Connected To TodoListDB successful");
+        const result = await article.findOne({name:req.params.articleName});
+        if(result){
+            res.send(result);
+        }else{
+            res.send('No such records found');
+        }
     }
-    catch(error)
-    {
-        console.log("error while connecting to TodoListDB ");
+    catch(err){
+        res.send(err);
     }
-}
-main()
 
-const ItemSchema = new mongoose.Schema({
-    name :{
-        type:String,
-        required: true
-    }
-});
-
-//Saving the collections name
-const Item = mongoose.model('Item',ItemSchema);
-
-//item1.save();
-
-// LIST SCHEMA and MODEL
-
-const listSchema = new mongoose.Schema({
-    name:String,
-    items: [ItemSchema]
 })
+.put(async(req,res)=>{
+    try{
+          await article.findOneAndUpdate({name:req.params.articleName},{name:req.body.name,content:req.body.content},{overwrite:true});
+          res.send("updated successfully");
+    }
+    catch(err){
+        res.send(err);
 
-const list = mongoose.model("list",listSchema);
+    }
 
 
-
-
-//  -------- HOME ROUTES----------
-
-//----------------Custom routes using route parameters----------------- 
-app.get("/:customListName",async (req,res)=>{
-    var route_name = req.params.customListName;
-    route_name = route_name.toLowerCase();
-  var list_document = await list.findOne({name:route_name});
-  if(list_document === null){
-    const list_1 = new list({
-       name:route_name,
-       items:[]
-    })
-    await list_1.save();
-    res.redirect("/"+route_name);
-
-  }else{
-    console.log(list_document,list_document.name);
-
-    res.render('list',{day:list_document.name,newItemsList:list_document.items});
+})
+.patch(async(req,res)=>{
+    try{
+        await article.findOneAndUpdate({name:req.params.articleName},{$set:{name:req.body.name,content:req.body.content}});
+        res.send("updated successfully");
+  }
+  catch(err){
+      res.send(err);
 
   }
-  
-   // console.log(newItemsList,typeof(newItemsList));
-   
-  
-});
 
-
-
-
-
-//HOME POST ROUTE
-app.post("/",async (req,res)=>{
-   console.log(req.body);
-    newItemsList.push(req.body.newItem);
-    
-    const list_doc = await list.findOne({name:req.body.list_Name});
-    
-    const item1 = new Item(
-    {
-        name :req.body.newItem
+})
+.delete(async(req,res)=>{
+    try{
+        await article.deleteOne({name:req.params.articleName});
+        res.send("deleted Successfully")
     }
-)
- await item1.save();
- list_doc.items.push(item1);
- await list_doc.save();
-    res.redirect("/"+list_doc.name);
-})
+    catch(err){
+         res.send(err);
+    }
 
-app.post("/delete",async (req,res)=>{
-    console.log(req.body.chkbox);
-    console.log(req.body.listName);
-   await list.findOneAndUpdate({name :req.body.listName},{$pull :{items:{_id:req.body.chkbox}}},
-   {new:true} );
-    res.redirect("/"+req.body.listName);
 })
 
 
-
-
-
-
-
-
-
-
-
-
-
-//----------------- server running code  ----------------------------
 app.listen(process.env.PORT || 3000,(err)=>{
     if(err)
-    console.log('error encountered');
+    console.log(err);
     else
-    console.log('Success 💯💯');
+    console.log('Server Running');
 })
